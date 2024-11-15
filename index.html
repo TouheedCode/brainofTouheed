@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Matching Game</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body & Page Layout */
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+
+        .game-container {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .restart-btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+
+        .restart-btn:hover {
+            background-color: #45a049;
+        }
+
+        /* Grid Style */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 150px);
+            grid-gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .card {
+            width: 150px;
+            height: 150px;
+            background-color: #3498db;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card.flipped {
+            background-color: white;
+            box-shadow: none;
+        }
+
+        .card .card-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+            display: none;
+        }
+
+        .card.flipped .card-content {
+            display: block;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 150px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Memory Matching Game</h1>
+        <div class="grid-container" id="game-board"></div>
+        <button class="restart-btn" onclick="restartGame()">Restart Game</button>
+    </div>
+
+    <script>
+        // Memory Matching Game Logic
+        const gameBoard = document.getElementById('game-board');
+        const cardValues = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        let shuffledCards = [...cardValues, ...cardValues].sort(() => Math.random() - 0.5);
+        let flippedCards = [];
+        let matchedCards = [];
+
+        // Create game cards
+        function createCards() {
+            shuffledCards.forEach(value => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.innerHTML = `<div class="card-content">${value}</div>`;
+                card.addEventListener('click', () => flipCard(card));
+                gameBoard.appendChild(card);
+            });
+        }
+
+        // Flip a card
+        function flipCard(card) {
+            if (flippedCards.length < 2 && !card.classList.contains('flipped') && !matchedCards.includes(card)) {
+                card.classList.add('flipped');
+                flippedCards.push(card);
+
+                if (flippedCards.length === 2) {
+                    checkMatch();
+                }
+            }
+        }
+
+        // Check if cards match
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            if (card1.textContent === card2.textContent) {
+                matchedCards.push(card1, card2);
+                flippedCards = [];
+                if (matchedCards.length === shuffledCards.length) {
+                    setTimeout(() => alert('You won the game!'), 300);
+                }
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    flippedCards = [];
+                }, 1000);
+            }
+        }
+
+        // Restart the game
+        function restartGame() {
+            gameBoard.innerHTML = '';
+            shuffledCards = [...cardValues, ...cardValues].sort(() => Math.random() - 0.5);
+            matchedCards = [];
+            createCards();
+        }
+
+        // Initialize the game
+        createCards();
+    </script>
+</body>
+</html>
